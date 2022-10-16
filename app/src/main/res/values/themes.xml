@@ -1,0 +1,16 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Light" parent="Theme.Material3.DayNight.NoActionBar">
+		<item name="colorAccent">#673ab7</item>
+		
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#673ab7</item>
+        <item name="colorOnPrimary">@color/white</item>
+		
+		<item name="colorSurface">#ffffff</item>
+		<item name="colorContainer">#ffffff</item>
+		
+		<item name="android:statusBarColor">?attr/colorPrimary</item>
+		<item name="android:fontFamily">@font/josefinsans_regular</item>
+    </style>
+</resources>
