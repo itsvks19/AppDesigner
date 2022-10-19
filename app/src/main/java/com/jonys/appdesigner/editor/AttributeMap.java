@@ -6,7 +6,6 @@ import java.util.HashMap;
 public class AttributeMap {
 	
 	private ArrayList<Attribute> attrs = new ArrayList<>();
-	private HashMap<String, String> map = new HashMap<>();
 	
 	public void putValue(String key, String value) {
 		if(contains(key)) {

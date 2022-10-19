@@ -7,10 +7,10 @@
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:hint="Enter dimension value"
-	app:boxCornerRadiusTopStart="@dimen/corner"
-	app:boxCornerRadiusTopEnd="@dimen/corner"
-	app:boxCornerRadiusBottomStart="@dimen/corner"
-	app:boxCornerRadiusBottomEnd="@dimen/corner">
+	app:boxCornerRadiusTopStart="@dimen/cornerLow"
+	app:boxCornerRadiusTopEnd="@dimen/cornerLow"
+	app:boxCornerRadiusBottomStart="@dimen/cornerLow"
+	app:boxCornerRadiusBottomEnd="@dimen/cornerLow">
 
 	<com.google.android.material.textfield.TextInputEditText
 		android:id="@+id/textinput_edittext"

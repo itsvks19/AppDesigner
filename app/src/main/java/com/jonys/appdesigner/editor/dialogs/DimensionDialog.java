@@ -24,6 +24,7 @@ public class DimensionDialog extends AttributeDialog {
 		this.unit = unit;
 		
 		textInputLayout = (TextInputLayout) LayoutInflater.from(context).inflate(R.layout.textinputlayout, null, false);
+		textInputLayout.setHint("Enter dimension value");
 		textInputEditText = textInputLayout.findViewById(R.id.textinput_edittext);
 		textInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
 		textInputEditText.setText(savedValue.equals("") ? "0" : DimensionUtil.getDimenWithoutSuffix(savedValue));

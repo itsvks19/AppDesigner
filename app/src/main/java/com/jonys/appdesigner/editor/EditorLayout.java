@@ -3,7 +3,9 @@ package com.jonys.appdesigner.editor;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.os.Vibrator;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
@@ -13,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.view.View;
 import android.widget.ListView;
@@ -24,17 +27,24 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import com.jonys.appdesigner.editor.AttributeInitializer;
 import com.jonys.appdesigner.editor.dialogs.*;
 import com.jonys.appdesigner.databinding.DefinedAttributeItemBinding;
 import com.jonys.appdesigner.databinding.DefinedAttributesDialogBinding;
+import com.jonys.appdesigner.managers.UndoRedoManager;
+import com.jonys.appdesigner.tools.XmlLayoutGenerator;
+import com.jonys.appdesigner.tools.XmlLayoutParser;
 import com.jonys.appdesigner.utils.ArgumentUtil;
 import com.jonys.appdesigner.utils.DimensionUtil;
 import com.jonys.appdesigner.utils.InvokeUtil;
 import com.jonys.appdesigner.utils.FileUtil;
 import com.jonys.appdesigner.tools.StructureView;
 import com.jonys.appdesigner.managers.IdManager;
+import com.jonys.appdesigner.managers.PreferencesManager;
+import com.jonys.appdesigner.managers.DrawableManager;
 import com.jonys.appdesigner.R;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,14 +55,22 @@ public class EditorLayout extends LinearLayout {
 	
 	private LayoutInflater inflater;
 	
-	private final View shadow;
+	private View shadow;
 	
 	private StructureView structureView;
+	
+	private AttributeInitializer initializer;
+	
+	private UndoRedoManager undoRedo;
 	
 	private HashMap<View, AttributeMap> viewAttributeMap = new HashMap<>();
 	
 	private HashMap<String, ArrayList<HashMap<String, Object>>> attributes;
 	private HashMap<String, ArrayList<HashMap<String, Object>>> parentAttributes;
+	
+	private Vibrator vibrator;
+	
+	private boolean drawStrokeEnabled = true;
 	
 	private final OnDragListener onDragListener = new OnDragListener() {
 		
@@ -67,6 +85,10 @@ public class EditorLayout extends LinearLayout {
 			
 			switch(event.getAction()) {
 				case DragEvent.ACTION_DRAG_STARTED: {
+					if(PreferencesManager.isEnabledVibro(getContext())) {
+						vibrator.vibrate(100);
+					}
+					
 					if(draggedView != null) {
 						parent.removeView(draggedView);
 					}
@@ -122,14 +144,12 @@ public class EditorLayout extends LinearLayout {
 						final View newView = (View) InvokeUtil.createView(data.get("className").toString(), getContext());
 						
 						newView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-						newView.setForeground(getResources().getDrawable(R.drawable.background_stroke_dash));
 						rearrangeListeners(newView);
 						
 						if(newView instanceof ViewGroup) {
+							newView.setOnDragListener(onDragListener);
 							newView.setMinimumWidth(getDip(20));
 							newView.setMinimumHeight(getDip(20));
-							newView.setOnDragListener(onDragListener);
-							
 							setupViewGroupAnimation((ViewGroup) newView);
 						}
 						
@@ -140,8 +160,17 @@ public class EditorLayout extends LinearLayout {
 						
 						addWidget(newView, parent, event);
 						
+						try {
+							Class cls = newView.getClass();
+							Method method = cls.getMethod("setStrokeEnabled", boolean.class);
+							method.invoke(newView, drawStrokeEnabled);
+						}
+						catch(Exception e) {
+							e.printStackTrace();
+						}
+						
 						if(data.containsKey("defaultAttributes")) {
-							applyDefaultAttributes(newView, (Map) data.get("defaultAttributes"));
+							initializer.applyDefaultAttributes(newView, (Map) data.get("defaultAttributes"));
 						}
 					}
 					else {
@@ -149,6 +178,7 @@ public class EditorLayout extends LinearLayout {
 					}
 					
 					updateStructure();
+					updateUndoRedoHistory();
 					return true;
 				}
 			}
@@ -171,19 +201,103 @@ public class EditorLayout extends LinearLayout {
 		
 		attributes = new Gson().fromJson(FileUtil.readFromAsset("attributes.java", context), new TypeToken<HashMap<String, ArrayList<HashMap<String, Object>>>>(){}.getType());
 		parentAttributes = new Gson().fromJson(FileUtil.readFromAsset("parent_attributes.java", context), new TypeToken<HashMap<String, ArrayList<HashMap<String, Object>>>>(){}.getType());
+		
+		initializer = new AttributeInitializer(context, viewAttributeMap, attributes, parentAttributes);
+		
+		vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+	}
+	
+	@Override
+	protected void onDraw(Canvas canvas) {
+	    super.onDraw(canvas);
+	}
+	
+	public void toggleStroke() {
+		drawStrokeEnabled = !drawStrokeEnabled;
+		toggleStrokeWidgets();
+	}
+	
+	private void toggleStrokeWidgets() {
+		try {
+			for(View view : viewAttributeMap.keySet()) {
+				Class cls = view.getClass();
+				Method method = cls.getMethod("setStrokeEnabled", boolean.class);
+				method.invoke(view, drawStrokeEnabled);
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadLayoutFromParser(String xml) {
+		clearAll();
+		
+		if(xml.equals("")) {
+			return;
+		}
+		
+		XmlLayoutParser parser = new XmlLayoutParser(getContext());
+		parser.parseFromXml(xml);
+		
+		addView(parser.getRoot());
+		viewAttributeMap = parser.getViewAttributeMap();
+		
+		for(View view : viewAttributeMap.keySet()) {
+			rearrangeListeners(view);
+						
+			if(view instanceof ViewGroup) {
+				view.setOnDragListener(onDragListener);
+				view.setMinimumWidth(getDip(20));
+				view.setMinimumHeight(getDip(20));
+				setupViewGroupAnimation((ViewGroup) view);
+			}
+		}
+		
+		updateStructure();
+		toggleStrokeWidgets();
+		
+		initializer = new AttributeInitializer(getContext(), viewAttributeMap, attributes, parentAttributes);
+	}
+	
+	public void undo() {
+		if(undoRedo.isUndoEnabled()) {
+			loadLayoutFromParser(undoRedo.undo());
+		}
+	}
+	
+	public void redo() {
+		if(undoRedo.isRedoEnabled()) {
+			loadLayoutFromParser(undoRedo.redo());
+		}
+	}
+	
+	public void clearAll() {
+		removeAllViews();
+		structureView.clear();
+		viewAttributeMap.clear();
 	}
 	
 	public void setStructureView(StructureView view) {
 		structureView = view;
 	}
 	
-	private void updateStructure() {
+	public void bindUndoRedoManager(UndoRedoManager manager) {
+		undoRedo = manager;
+	}
+	
+	public void updateStructure() {
 		if(getChildCount() == 0) {
 			structureView.clear();
 		}
 		else {
 			structureView.setView(getChildAt(0));
 		}
+	}
+	
+	public void updateUndoRedoHistory() {
+		String result = new XmlLayoutGenerator().generate(this, false);
+		undoRedo.addToHistory(result);
 	}
 	
 	private void rearrangeListeners(final View view) {
@@ -318,7 +432,7 @@ public class EditorLayout extends LinearLayout {
 		final ArrayList<String> values = viewAttributeMap.get(target).values();
 		
 		final ArrayList<HashMap<String, Object>> attrs = new ArrayList<>();
-		final ArrayList<HashMap<String, Object>> allAttrs = getAllAttributesForView(target);
+		final ArrayList<HashMap<String, Object>> allAttrs = initializer.getAllAttributesForView(target);
 		
 		for(String key : keys) {
 			for(HashMap<String, Object> map : allAttrs) {
@@ -375,7 +489,7 @@ public class EditorLayout extends LinearLayout {
 		};
 		
 		dialogBinding.listView.setAdapter(adapter);
-		dialogBinding.widgetName.setText(target.getClass().getSimpleName());
+		dialogBinding.widgetName.setText(target.getClass().getSuperclass().getSimpleName());
 		dialogBinding.btnAdd.setOnClickListener(v -> {
 			
 			showAvailableAttributes(target);
@@ -395,6 +509,7 @@ public class EditorLayout extends LinearLayout {
 				removeWidget(target);
 				viewAttributeMap.remove(target);
 				updateStructure();
+				updateUndoRedoHistory();
 				dialog.dismiss();
 			});
 			confirm.create().show();
@@ -407,7 +522,7 @@ public class EditorLayout extends LinearLayout {
 		final MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
 		builder.setTitle("Available attributes");
 		
-		final ArrayList<HashMap<String, Object>> availableAttrs = getAvailableAttributesForView(target);
+		final ArrayList<HashMap<String, Object>> availableAttrs = initializer.getAvailableAttributesForView(target);
 		final ArrayList<String> names = new ArrayList<>();
 		
 		for(HashMap<String, Object> attr : availableAttrs) {
@@ -425,22 +540,9 @@ public class EditorLayout extends LinearLayout {
 		builder.create().show();
 	}
 	
-	private void applyDefaultAttributes(final View target, final Map<String, String> defaultAttrs) {
-		ArrayList<HashMap<String, Object>> allAttrs = getAllAttributesForView(target);
-		
-		for(String key : defaultAttrs.keySet()) {
-			for(HashMap<String, Object> map : allAttrs) {
-				if(map.get("attributeName").toString().equals(key)) {
-					applyAttribute(target, defaultAttrs.get(key).toString(), map);
-					break;
-				}
-			}
-		}
-	}
-	
 	private void showAttributeEdit(final View target, final String attributeKey) {
-		final ArrayList<HashMap<String, Object>> allAttrs = getAllAttributesForView(target);
-		final HashMap<String, Object> currentAttr = getAttributeFromKey(attributeKey, allAttrs);
+		final ArrayList<HashMap<String, Object>> allAttrs = initializer.getAllAttributesForView(target);
+		final HashMap<String, Object> currentAttr = initializer.getAttributeFromKey(attributeKey, allAttrs);
 		final AttributeMap attributeMap = viewAttributeMap.get(target);
 		
 		final String[] argumentTypes = currentAttr.get("argumentType").toString().split("\\|");
@@ -468,8 +570,8 @@ public class EditorLayout extends LinearLayout {
 	}
 	
 	private void showAttributeEdit(final View target, final String attributeKey, final String argumentType) {
-		final ArrayList<HashMap<String, Object>> allAttrs = getAllAttributesForView(target);
-		final HashMap<String, Object> currentAttr = getAttributeFromKey(attributeKey, allAttrs);
+		final ArrayList<HashMap<String, Object>> allAttrs = initializer.getAllAttributesForView(target);
+		final HashMap<String, Object> currentAttr = initializer.getAttributeFromKey(attributeKey, allAttrs);
 		final AttributeMap attributeMap = viewAttributeMap.get(target);
 		
 		final String savedValue = attributeMap.contains(attributeKey) ? attributeMap.getValue(attributeKey) : "";
@@ -497,6 +599,10 @@ public class EditorLayout extends LinearLayout {
 			break;
 			
 			case "boolean":
+			dialog = new BooleanDialog(context, savedValue);
+			break;
+			
+			case "drawable":
 			case "string":
 			dialog = new StringDialog(context, savedValue);
 			break;
@@ -535,34 +641,13 @@ public class EditorLayout extends LinearLayout {
 				}
 			}
 			else {
-				applyAttribute(target, value, currentAttr);
+				initializer.applyAttribute(target, value, currentAttr);
 				showDefinedAttributes(target);
+				updateUndoRedoHistory();
 			}
 		});
 		
 		dialog.show();
-	}
-	
-	private void applyAttribute(final View target, final String value, final HashMap<String, Object> attribute) {
-		String methodName = attribute.get("methodName").toString();
-		String className = attribute.get("className").toString();
-		String attributeName = attribute.get("attributeName").toString();
-		
-		viewAttributeMap.get(target).putValue(attributeName, value);
-		InvokeUtil.invokeMethod(methodName, className, target, value, getContext());
-		
-		//update ids attributes for all views
-		if(value.startsWith("@+id/") && viewAttributeMap.get(target).contains("android:id")) {
-			for(View view : viewAttributeMap.keySet()) {
-				AttributeMap map = viewAttributeMap.get(view);
-				
-				for(String key : map.keySet()) {
-					if(map.getValue(key).startsWith("@id/")) {
-						map.putValue(key, value.replace("+", ""));
-					}
-				}
-			}
-		}
 	}
 	
 	private void removeViewAttributes(View view) {
@@ -578,8 +663,8 @@ public class EditorLayout extends LinearLayout {
 	}
 	
 	private View removeAttribute(View target, final String attributeKey) {
-		final ArrayList<HashMap<String, Object>> allAttrs = getAllAttributesForView(target);
-		final HashMap<String, Object> currentAttr = getAttributeFromKey(attributeKey, allAttrs);
+		final ArrayList<HashMap<String, Object>> allAttrs = initializer.getAllAttributesForView(target);
+		final HashMap<String, Object> currentAttr = initializer.getAttributeFromKey(attributeKey, allAttrs);
 		
 		final AttributeMap attributeMap = viewAttributeMap.get(target);
 		
@@ -641,7 +726,6 @@ public class EditorLayout extends LinearLayout {
 		}
 		
 		target = (View) InvokeUtil.createView(target.getClass().getName(), getContext());
-		target.setForeground(getResources().getDrawable(R.drawable.background_stroke_dash));
 		rearrangeListeners(target);
 		
 		if(target instanceof ViewGroup) {
@@ -662,8 +746,6 @@ public class EditorLayout extends LinearLayout {
 			
 		parent.addView(target, indexOfView);
 		viewAttributeMap.put(target, attributeMap);
-		
-		updateStructure();
 		
 		if(name != null) {
 			IdManager.addId(target, name, id);
@@ -691,65 +773,26 @@ public class EditorLayout extends LinearLayout {
 			if(key.equals("android:id"))
 				continue;
 				
-			applyAttribute(target, values.get(i), attrs.get(i));
+			initializer.applyAttribute(target, values.get(i), attrs.get(i));
 		}
+		
+		try {
+			Class cls = target.getClass();
+			Method method = cls.getMethod("setStrokeEnabled", boolean.class);
+			method.invoke(target, drawStrokeEnabled);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+						
+		updateStructure();
+		updateUndoRedoHistory();
 		
 		return target;
 	}
 	
-	private ArrayList<HashMap<String, Object>> getAvailableAttributesForView(final View target) {
-		final ArrayList<String> keys = viewAttributeMap.get(target).keySet();
-		final ArrayList<HashMap<String, Object>> allAttrs = getAllAttributesForView(target);
-		
-		for(int i = allAttrs.size() - 1; i >= 0; i --) {
-			for(String key : keys) {
-				if(key.equals(allAttrs.get(i).get("attributeName").toString())) {
-					allAttrs.remove(i);
-					break;
-				}
-			}
-		}
-		
-		return allAttrs;
-	}
-	
-	private ArrayList<HashMap<String, Object>> getAllAttributesForView(final View target) {
-		ArrayList<HashMap<String, Object>> allAttrs = new ArrayList<>();
-		
-		Class cls = target.getClass();
-		Class viewParentCls = View.class.getSuperclass();
-		
-		while(cls != viewParentCls) {
-			if(attributes.containsKey(cls.getName())) {
-				allAttrs.addAll(0, attributes.get(cls.getName()));
-			}
-			
-			cls = cls.getSuperclass();
-		}
-		
-		if(target.getParent() != null && target.getParent() != this) {
-			cls = target.getParent().getClass();
-		
-			while(cls != viewParentCls) {
-				if(parentAttributes.containsKey(cls.getName())) {
-					allAttrs.addAll(parentAttributes.get(cls.getName()));
-				}
-			
-				cls = cls.getSuperclass();
-			}
-		}
-		
-		return allAttrs;
-	}
-	
-	private HashMap<String, Object> getAttributeFromKey(String key, ArrayList<HashMap<String, Object>> list) {
-		for(HashMap<String, Object> map : list) {
-			if(map.get("attributeName").equals(key)) {
-				return map;
-			}
-		}
-		
-		return null;
+	public HashMap<View, AttributeMap> getViewAttributeMap() {
+		return viewAttributeMap;
 	}
 	
 	@Override
@@ -765,5 +808,9 @@ public class EditorLayout extends LinearLayout {
 	
 	private int getDip(int value) {
 		return (int) DimensionUtil.getDip(getContext(), value);
+	}
+	
+	private String getString(int id) {
+		return getResources().getString(id);
 	}
 }

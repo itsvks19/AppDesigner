@@ -28,10 +28,26 @@
 		},
 		
 		{
+			"name" : "Alpha",
+			"methodName" : "setAlpha",
+			"className" : "ViewCaller",
+			"attributeName" : "android:alpha",
+			"argumentType" : "float"
+		},
+		
+		{
 			"name" : "Background",
 			"methodName" : "setBackground",
 			"className" : "ViewCaller",
 			"attributeName" : "android:background",
+			"argumentType" : "color|drawable"
+		},
+		
+		{
+			"name" : "Foreground",
+			"methodName" : "setForeground",
+			"className" : "ViewCaller",
+			"attributeName" : "android:foreground",
 			"argumentType" : "color|drawable"
 		},
 		
@@ -42,14 +58,6 @@
 			"attributeName" : "android:elevation",
 			"argumentType" : "dimension",
 			"dimensionUnit" : "dp"
-		},
-		
-		{
-			"name" : "Alpha",
-			"methodName" : "setAlpha",
-			"className" : "ViewCaller",
-			"attributeName" : "android:alpha",
-			"argumentType" : "float"
 		},
 		
 		{
@@ -158,6 +166,44 @@
 		}
 	],
 	
+	"androidx.cardview.widget.CardView":
+	[
+		{
+			"name" : "Card Elevation",
+			"methodName" : "setCardElevation",
+			"className" : "CardViewCaller",
+			"attributeName" : "app:cardElevation",
+			"argumentType" : "dimension",
+			"dimensionUnit" : "dp"
+		},
+		
+		{
+			"name" : "Card Corner Radius",
+			"methodName" : "setCardCornerRadius",
+			"className" : "CardViewCaller",
+			"attributeName" : "app:cardCornerRadius",
+			"argumentType" : "dimension",
+			"dimensionUnit" : "dp"
+		},
+		
+		{
+			"name" : "Card Background Color",
+			"methodName" : "setCardBackgroundColor",
+			"className" : "CardViewCaller",
+			"attributeName" : "app:cardBackgroundColor",
+			"argumentType" : "color"
+		},
+		
+		{
+			"name" : "Card Use Compat Padding",
+			"methodName" : "setCardUseCompatPadding",
+			"className" : "CardViewCaller",
+			"attributeName" : "app:cardUseCompatPadding",
+			"argumentType" : "boolean",
+			"defaultValue" : "false"
+		}
+	],
+	
 	"android.widget.TextView" :
 	[
 		{
@@ -213,6 +259,88 @@
 			"className" : "TextViewCaller",
 			"attributeName" : "android:hint",
 			"argumentType" : "string"
+		}
+	],
+	
+	"android.widget.ImageView" :
+	[
+		{
+			"name" : "Src",
+			"methodName" : "setImage",
+			"className" : "ImageViewCaller",
+			"attributeName" : "android:src",
+			"argumentType" : "drawable"
+		},
+		
+		{
+			"name" : "Scale Type",
+			"methodName" : "setScaleType",
+			"className" : "ImageViewCaller",
+			"attributeName" : "android:scaleType",
+			"argumentType" : "enum",
+			"arguments" :
+			[
+				"fitXY",
+				"fitStart",
+				"fitCenter",
+				"fitEnd",
+				"center",
+				"centerCrop",
+				"centerInside"
+			],
+			"defaultValue" : "-1"
+		},
+		
+		{
+			"name" : "Tint",
+			"methodName" : "setTint",
+			"className" : "ImageViewCaller",
+			"attributeName" : "android:tint",
+			"argumentType" : "color"
+		}
+	],
+	
+	"com.google.android.material.floatingactionbutton.FloatingActionButton" :
+	[
+		{
+			"name" : "Background Color",
+			"methodName" : "setBackgroundColor",
+			"className" : "FABCaller",
+			"attributeName" : "app:background",
+			"argumentType" : "color"
+		},
+		
+		{
+			"name" : "FAB Size",
+			"methodName" : "setSize",
+			"className" : "FABCaller",
+			"attributeName" : "app:fabSize",
+			"argumentType" : "enum",
+			"arguments" :
+			[
+				"auto",
+				"mini",
+				"normal"
+			],
+			"defaultValue" : "-1"
+		},
+		
+		{
+			"name" : "FAB Custom Size",
+			"methodName" : "setCustomSize",
+			"className" : "FABCaller",
+			"attributeName" : "app:fabCustomSize",
+			"argumentType" : "dimension",
+			"dimensionUnit" : "dp"
+		},
+		
+		{
+			"name" : "Compat Elevation",
+			"methodName" : "setCompatElevation",
+			"className" : "FABCaller",
+			"attributeName" : "app:elevation",
+			"argumentType" : "dimension",
+			"dimensionUnit" : "dp"
 		}
 	]
 }

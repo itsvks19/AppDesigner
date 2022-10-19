@@ -166,25 +166,30 @@ public class RelativeLayoutCaller {
 	public static void setLayoutMargin(View target, String value, Context context) {
 		int margin = (int) DimensionUtil.parse(value, context);
 		((RelativeLayout.LayoutParams) target.getLayoutParams()).setMargins(margin, margin, margin, margin);
+		target.requestLayout();
 	}
 
 	public static void setLayoutMarginLeft(View target, String value, Context context) {
 		int margin = (int) DimensionUtil.parse(value, context);
 		((RelativeLayout.LayoutParams) target.getLayoutParams()).leftMargin = margin;
+		target.requestLayout();
 	}
 
 	public static void setLayoutMarginRight(View target, String value, Context context) {
 		int margin = (int) DimensionUtil.parse(value, context);
 		((RelativeLayout.LayoutParams) target.getLayoutParams()).rightMargin = margin;
+		target.requestLayout();
 	}
 
 	public static void setLayoutMarginTop(View target, String value, Context context) {
 		int margin = (int) DimensionUtil.parse(value, context);
 		((RelativeLayout.LayoutParams) target.getLayoutParams()).topMargin = margin;
+		target.requestLayout();
 	}
 
 	public static void setLayoutMarginBottom(View target, String value, Context context) {
 		int margin = (int) DimensionUtil.parse(value, context);
 		((RelativeLayout.LayoutParams) target.getLayoutParams()).bottomMargin = margin;
+		target.requestLayout();
 	}
 }

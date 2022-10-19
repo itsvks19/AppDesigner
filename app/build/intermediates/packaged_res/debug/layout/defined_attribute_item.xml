@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@drawable/list_selector"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:padding="15dp"
+	android:background="?attr/selectableItemBackground">
     
     <TextView
         android:id="@+id/text_name"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:text="Layout width"
-        android:textColor="@color/purple_700"
+        android:textColor="?attr/colorAccent"
         android:textSize="16sp"/>
     
     <TextView
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:text="match_parent"
-        android:textColor="@color/purple_500"
+        android:textColor="?attr/colorAccent"
         android:textSize="12sp"/>
     
     <ImageButton
@@ -30,7 +30,6 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:src="@drawable/close"
-		android:tint="@color/black"/>
+		android:tint="?attr/colorOnSurface"/>
     
-
 </RelativeLayout>

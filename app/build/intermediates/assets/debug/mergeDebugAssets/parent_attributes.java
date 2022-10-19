@@ -55,6 +55,73 @@
 		}
 	],
 	
+	"android.widget.FrameLayout" :
+	[
+		{
+			"name" : "Layout Gravity",
+			"methodName" : "setLayoutGravity",
+			"className" : "FrameLayoutCaller",
+			"attributeName" : "android:layout_gravity",
+			"argumentType" : "flag",
+			"arguments" :
+			[
+				"left",
+				"right",
+				"top",
+				"bottom",
+				"center",
+				"center_horizontal",
+				"center_vertical"
+			],
+			"defaultValue" : "-1"
+		},
+		
+		{
+			"name" : "Layout Margin",
+			"methodName" : "setLayoutMargin",
+			"className" : "FrameLayoutCaller",
+			"attributeName" : "android:layout_margin",
+			"argumentType" : "dimension",
+			"dimensionUnit" : "dp"
+		},
+		
+		{
+			"name" : "Layout Margin Left",
+			"methodName" : "setLayoutMarginLeft",
+			"className" : "FrameLayoutCaller",
+			"attributeName" : "android:layout_marginLeft",
+			"argumentType" : "dimension",
+			"dimensionUnit" : "dp"
+		},
+		
+		{
+			"name" : "Layout Margin Right",
+			"methodName" : "setLayoutMarginRight",
+			"className" : "FrameLayoutCaller",
+			"attributeName" : "android:layout_marginRight",
+			"argumentType" : "dimension",
+			"dimensionUnit" : "dp"
+		},
+		
+		{
+			"name" : "Layout Margin Top",
+			"methodName" : "setLayoutMarginTop",
+			"className" : "FrameLayoutCaller",
+			"attributeName" : "android:layout_marginTop",
+			"argumentType" : "dimension",
+			"dimensionUnit" : "dp"
+		},
+		
+		{
+			"name" : "Layout Margin Bottom",
+			"methodName" : "setLayoutMarginBottom",
+			"className" : "FrameLayoutCaller",
+			"attributeName" : "android:layout_marginBottom",
+			"argumentType" : "dimension",
+			"dimensionUnit" : "dp"
+		}
+	],
+	
 	"android.widget.RelativeLayout" :
 	[
 		{

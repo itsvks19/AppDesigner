@@ -10,6 +10,8 @@ import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
+import com.jonys.appdesigner.R;
+
 public class AttributeDialog {
 	
 	private Context context;
@@ -69,6 +71,10 @@ public class AttributeDialog {
 	
 	private int getDip(int value) {
 		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, context.getResources().getDisplayMetrics());
+	}
+	
+	protected String getString(int id) {
+		return context.getString(id);
 	}
 	
 	public void setOnSaveValueListener(OnSaveValueListener listener) {

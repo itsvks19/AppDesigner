@@ -35,6 +35,7 @@ public class SizeDialog extends AttributeDialog {
 		final RadioButton rbFixedValue = dialogView.findViewById(R.id.rb_fixed_value);
 		
 		textInputLayout = dialogView.findViewById(R.id.textinput_layout);
+		textInputLayout.setHint("Enter dimension value");
 		textInputLayout.setVisibility(View.GONE);
 		
 		textInputEditText = dialogView.findViewById(R.id.textinput_edittext);

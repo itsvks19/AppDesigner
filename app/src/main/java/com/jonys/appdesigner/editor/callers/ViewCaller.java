@@ -2,8 +2,11 @@ package com.jonys.appdesigner.editor.callers;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 
+import com.jonys.appdesigner.managers.DrawableManager;
+import com.jonys.appdesigner.utils.ArgumentUtil;
 import com.jonys.appdesigner.utils.DimensionUtil;
 import com.jonys.appdesigner.managers.IdManager;
 
@@ -24,7 +27,23 @@ public class ViewCaller {
 	}
 	
 	public static void setBackground(View target, String value, Context context) {
-		target.setBackgroundColor(Color.parseColor(value));
+		if(ArgumentUtil.parseType(value, new String[] {"color", "drawable"}).equals(ArgumentUtil.COLOR)) {
+			target.setBackgroundColor(Color.parseColor(value));
+		}
+		else {
+			String name = value.replace("@drawable/", "");
+			target.setBackgroundDrawable(DrawableManager.getDrawable(name));
+		}
+	}
+	
+	public static void setForeground(View target, String value, Context context) {
+		if(ArgumentUtil.parseType(value, new String[] {"color", "drawable"}).equals(ArgumentUtil.COLOR)) {
+			target.setForeground(new ColorDrawable(Color.parseColor(value)));
+		}
+		else {
+			String name = value.replace("@drawable/", "");
+			target.setForeground(DrawableManager.getDrawable(name));
+		}
 	}
 	
 	public static void setElevation(View target, String value, Context context) {

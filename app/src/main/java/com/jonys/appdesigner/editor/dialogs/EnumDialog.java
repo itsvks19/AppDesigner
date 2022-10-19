@@ -27,7 +27,7 @@ public class EnumDialog extends AttributeDialog {
 			listview.setItemChecked(arguments.indexOf(savedValue), true);
 		}
 		
-		setView(listview, 0, 10, 0, 0);
+		setView(listview, 0, 20, 0, 0);
 	}
 	
 	@Override

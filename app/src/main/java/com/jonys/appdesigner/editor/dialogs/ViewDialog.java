@@ -29,7 +29,7 @@ public class ViewDialog extends AttributeDialog {
 			listview.setItemChecked(ids.indexOf(savedValue.replace("@id/", "")), true);
 		}
 		
-		setView(listview, 0, 10, 0, 0);
+		setView(listview, 0, 20, 0, 0);
 	}
 	
 	@Override

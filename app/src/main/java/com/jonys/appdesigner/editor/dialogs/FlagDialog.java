@@ -34,7 +34,7 @@ public class FlagDialog extends AttributeDialog {
 		}
 		
 		
-		setView(listview, 0, 10, 0, 0);
+		setView(listview, 0, 20, 0, 0);
 	}
 	
 	@Override

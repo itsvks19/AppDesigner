@@ -1,47 +1,70 @@
 [
 	{
 		"name" : "LinearLayout (H)",
-		"className" : "android.widget.LinearLayout",
+		"className" : "com.jonys.appdesigner.editor.widgets.LinearLayoutDesign",
 		"iconName" : "ic_linear",
 		"defaultAttributes" : 
 		{
 			"android:layout_width" : "match_parent",
-			"android:orientation" : "horizontal"
+			"android:orientation" : "horizontal",
+			"android:padding" : "8dp"
 		}
 	},
 	
 	{
 		"name" : "LinearLayout (V)",
-		"className" : "android.widget.LinearLayout",
+		"className" : "com.jonys.appdesigner.editor.widgets.LinearLayoutDesign",
 		"iconName" : "ic_linear",
 		"defaultAttributes" : 
 		{
 			"android:layout_height" : "match_parent",
-			"android:orientation" : "vertical"
+			"android:orientation" : "vertical",
+			"android:padding" : "8dp"
 		}
 	},
 	
 	{
-		"name" : "Scroll (H)",
-		"className" : "android.widget.HorizontalScrollView",
-		"iconName" : "ic_scroll"
-	},
-	
-	{
-		"name" : "Scroll (V)",
-		"className" : "android.widget.ScrollView",
-		"iconName" : "ic_scroll"
+		"name" : "RadioGroup",
+		"className" : "com.jonys.appdesigner.editor.widgets.RadioGroupDesign",
+		"iconName" : "ic_radiogroup",
+		"defaultAttributes" :
+		{
+			"android:layout_width" : "match_parent",
+			"android:padding" : "8dp"
+		}
 	},
 	
 	{
 		"name" : "FrameLayout",
-		"className" : "android.widget.FrameLayout",
-		"iconName" : "ic_frame"
+		"className" : "com.jonys.appdesigner.editor.widgets.FrameLayoutDesign",
+		"iconName" : "ic_frame",
+		"defaultAttributes" :
+		{
+			"android:layout_width" : "match_parent",
+			"android:padding" : "8dp"
+		}
 	},
 	
 	{
 		"name" : "RelativeLayout",
-		"className" : "android.widget.RelativeLayout",
-		"iconName" : "ic_relative"
+		"className" : "com.jonys.appdesigner.editor.widgets.RelativeLayoutDesign",
+		"iconName" : "ic_relative",
+		"defaultAttributes" :
+		{
+			"android:layout_width" : "match_parent",
+			"android:padding" : "8dp"
+		}
+	},
+	
+	{
+		"name" : "CardView",
+		"className" : "com.jonys.appdesigner.editor.widgets.CardViewDesign",
+		"iconName" : "ic_card",
+		"defaultAttributes" :
+		{
+			"android:layout_width" : "match_parent",
+			"app:cardCornerRadius" : "8dp",
+			"app:cardElevation" : "4dp"
+		}
 	}
 ]

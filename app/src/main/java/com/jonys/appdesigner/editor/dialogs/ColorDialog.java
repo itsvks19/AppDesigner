@@ -107,7 +107,7 @@ public class ColorDialog extends AttributeDialog implements SeekBar.OnSeekBarCha
 		}
 		
 		inputLayout.setErrorEnabled(true);
-		inputLayout.setError("Invalid HEX value!");
+		inputLayout.setError("Invalid HEX value");
 		setEnabled(false);
 	}
 	

@@ -67,7 +67,7 @@ public class StructureView extends LinearLayout implements OnClickListener {
 		int nextDepth = depth;
 		TextView text = (TextView) inflater.inflate(android.R.layout.simple_list_item_1, null, false);
 		text.setTextSize(16);
-		text.setText(view.getClass().getSimpleName());
+		text.setText(view.getClass().getSuperclass().getSimpleName());
 		text.setOnClickListener(this);
 		
 		int pad = getDip(8);

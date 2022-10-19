@@ -32,7 +32,13 @@ public final class ActivityEditorBinding implements ViewBinding {
   public final ImageButton btnOptions;
 
   @NonNull
+  public final ImageButton btnRedo;
+
+  @NonNull
   public final ImageButton btnStructure;
+
+  @NonNull
+  public final ImageButton btnUndo;
 
   @NonNull
   public final LinearLayout content;
@@ -56,14 +62,17 @@ public final class ActivityEditorBinding implements ViewBinding {
   public final TextView title;
 
   private ActivityEditorBinding(@NonNull DrawerLayout rootView, @NonNull ImageButton btnMenu,
-      @NonNull ImageButton btnOptions, @NonNull ImageButton btnStructure,
+      @NonNull ImageButton btnOptions, @NonNull ImageButton btnRedo,
+      @NonNull ImageButton btnStructure, @NonNull ImageButton btnUndo,
       @NonNull LinearLayout content, @NonNull DrawerLayout drawer,
       @NonNull EditorLayout editorLayout, @NonNull ListView listView,
       @NonNull StructureView structureView, @NonNull TabLayout tabLayout, @NonNull TextView title) {
     this.rootView = rootView;
     this.btnMenu = btnMenu;
     this.btnOptions = btnOptions;
+    this.btnRedo = btnRedo;
     this.btnStructure = btnStructure;
+    this.btnUndo = btnUndo;
     this.content = content;
     this.drawer = drawer;
     this.editorLayout = editorLayout;
@@ -112,9 +121,21 @@ public final class ActivityEditorBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.btn_redo;
+      ImageButton btnRedo = ViewBindings.findChildViewById(rootView, id);
+      if (btnRedo == null) {
+        break missingId;
+      }
+
       id = R.id.btn_structure;
       ImageButton btnStructure = ViewBindings.findChildViewById(rootView, id);
       if (btnStructure == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_undo;
+      ImageButton btnUndo = ViewBindings.findChildViewById(rootView, id);
+      if (btnUndo == null) {
         break missingId;
       }
 
@@ -156,8 +177,9 @@ public final class ActivityEditorBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityEditorBinding((DrawerLayout) rootView, btnMenu, btnOptions, btnStructure,
-          content, drawer, editorLayout, listView, structureView, tabLayout, title);
+      return new ActivityEditorBinding((DrawerLayout) rootView, btnMenu, btnOptions, btnRedo,
+          btnStructure, btnUndo, content, drawer, editorLayout, listView, structureView, tabLayout,
+          title);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

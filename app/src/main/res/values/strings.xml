@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">App Designer</string>
+    <string name="app_name" translatable="false">App Designer</string>
+	
 </resources>
